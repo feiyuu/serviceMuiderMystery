@@ -30,15 +30,20 @@ class MainController extends Controller {
     }
   }
   async getTypeInfo() {
-    const resType = await this.app.mysql.select("type");
+    const resType = await this.app.mysql.select("type",{orders:[['id']]});
     this.ctx.body = { data: resType };
   }
+   //获取剧本所有发行商
+   async getPublishers() {
+    const publisher = await this.app.mysql.select("publisher",{orders:[['id']]});
+    this.ctx.body = { data: publisher };
+  }
+  
   async addArticle() {
     let tempArticle = this.ctx.request.body;
     const result = await this.app.mysql.insert("article", tempArticle);
     const insertSuccess = result.affectedRows === 1;
     const insertId = result.insertId;
-
     this.ctx.body = {
       isSuccess: insertSuccess,
       insertId,
@@ -60,16 +65,18 @@ class MainController extends Controller {
     };
   }
 
-  //获得文章列表
+  //获得剧本列表
   async getArticleList() {
     let sql =
       "SELECT article.id as id," +
       "article.title as title," +
       "article.introduce as introduce," +
       "article.view_count as view_count ," +
-      "FROM_UNIXTIME(article.addTime,'%Y-%m-%d' ) as addTime," +
-      "type.typeName as typeName " +
+      "FROM_UNIXTIME(article.addTime,'%Y-%m-%d') as addTime," +
+      "type.typeName as typeName," +
+      "publisher.publisherName as publisherName " +
       "FROM article LEFT JOIN type ON article.type_id = type.Id " +
+      "LEFT JOIN publisher ON article.publisher_id = publisher.Id " +
       "ORDER BY article.id DESC ";
 
     const resList = await this.app.mysql.query(sql);
@@ -89,7 +96,7 @@ class MainController extends Controller {
       "article.title as title," +
       "article.introduce as introduce," +
       "article.article_content as article_content," +
-      "FROM_UNIXTIME(article.addTime,'%Y-%m-%d' ) as addTime," +
+      "FROM_UNIXTIME(article.addTime,'%Y-%m-%d') as addTime," +
       "article.view_count as view_count ," +
       "type.typeName as typeName ," +
       "type.id as typeId " +

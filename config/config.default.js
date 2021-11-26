@@ -23,7 +23,7 @@ module.exports = (appInfo) => {
       // password
       password: "12345678",
       // database
-      database: "react_blog",
+      database: "script_store_ms",
     },
     // load into app, default is open
     app: true,
