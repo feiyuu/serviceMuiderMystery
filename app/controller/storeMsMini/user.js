@@ -101,12 +101,175 @@ class MainController extends Controller {
     const queryObj = this.ctx.query;
     const sql =
       " SELECT avatarUrl,gender,nickName,integral,balance FROM users WHERE users.openid = '" +
-      queryObj.openid +"'";
+      queryObj.openid +
+      "'";
     const res = await this.app.mysql.query(sql);
     if (res.length > 0) {
       this.ctx.body = { data: res, code: 1 };
     } else {
       this.ctx.body = { data: "", code: 2 };
+    }
+  }
+  async getBalanceUser() {
+    const queryObj = this.ctx.query;
+    const user = await this.app.mysql.get("users", { openid: queryObj.openid });
+    if (user) {
+      this.ctx.body = { data: user.balance, code: 1 };
+    } else {
+      this.ctx.body = { data: "", code: 2 };
+    }
+  }
+  async payCharge() {
+    let data = this.ctx.request.body;
+    console.log("datapay=====" + JSON.stringify(data));
+
+    if (
+      data.recordUserId == "undefined" ||
+      data.recordUserId == "" ||
+      data.recordUserId == null
+    ) {
+      this.ctx.body = {
+        data: "请登录后再试",
+        code: 0,
+      };
+      return;
+    }
+    console.log("data.isBlance" + data.isBlance);
+    let success = false;
+
+    if (data.isBlance == "true") {
+      const conn = await this.app.mysql.beginTransaction();
+      try {
+        let sqlUpdata =
+          "UPDATE users SET balance = balance - " +
+          data.charge +
+          " WHERE openid = '" +
+          data.recordUserId +
+          "'";
+        await conn.query(sqlUpdata);
+        await conn.insert("purchase_record", {
+          ...data,
+          recordTime: new Date(+new Date() + 8 * 3600 * 1000)
+            .toJSON()
+            .substr(0, 19)
+            .replace("T", " "),
+        });
+        await conn.commit(); //提交事务
+        success = true;
+      } catch (err) {
+        success = false;
+        await conn.rollback(); //回滚事务
+        throw err;
+      }
+    } else {
+      const result = await this.app.mysql.insert("purchase_record", {
+        ...data,
+        recordTime: new Date(+new Date() + 8 * 3600 * 1000)
+          .toJSON()
+          .substr(0, 19)
+          .replace("T", " "),
+      });
+      success = result.affectedRows === 1;
+    }
+
+    if (success) {
+      this.ctx.body = {
+        data: "支付成功",
+        code: 1,
+      };
+    } else {
+      this.ctx.body = {
+        data: "支付失败",
+        code: 0,
+      };
+    }
+  }
+  async reCharge() {
+    let data = this.ctx.request.body;
+    console.log("reCharge=====" + JSON.stringify(data));
+
+    if (
+      data.recordUserId == "undefined" ||
+      data.recordUserId == "" ||
+      data.recordUserId == null
+    ) {
+      this.ctx.body = {
+        data: "请登录后再试",
+        code: 0,
+      };
+      return;
+    }
+    let success = false;
+    const conn = await this.app.mysql.beginTransaction();
+    try {
+      let sqlUpdata =
+        "UPDATE users SET balance = balance + " +
+        data.charge +",integral = integral + " +
+        data.charge +
+        " WHERE openid = '" +
+        data.recordUserId +
+        "'";
+      await conn.query(sqlUpdata);
+      await conn.insert("purchase_record", {
+        ...data,
+        recordTime: new Date(+new Date() + 8 * 3600 * 1000)
+          .toJSON()
+          .substr(0, 19)
+          .replace("T", " "),
+      });
+      await conn.commit(); //提交事务
+      success = true;
+    } catch (err) {
+      success = false;
+      await conn.rollback(); //回滚事务
+      throw err;
+    }
+
+    if (success) {
+      this.ctx.body = {
+        data: "支付成功",
+        code: 1,
+      };
+    } else {
+      this.ctx.body = {
+        data: "支付失败",
+        code: 0,
+      };
+    }
+  }
+  async joinTeam() {
+    let data = this.ctx.request.body;
+    console.log("datapay=====" + JSON.stringify(data));
+
+    if (
+      data.teamUserId == "undefined" ||
+      data.teamUserId == "" ||
+      data.teamUserId == null
+    ) {
+      this.ctx.body = {
+        data: "请登录后再试",
+        code: 0,
+      };
+      return;
+    }
+    const result = await this.app.mysql.insert("teamusers", {
+      ...data,
+      teamUserJoinTime: new Date(+new Date() + 8 * 3600 * 1000)
+        .toJSON()
+        .substr(0, 19)
+        .replace("T", " "),
+    });
+    const success = result.affectedRows === 1;
+    if (success) {
+      this.ctx.body = {
+        data: "",
+        code: 1,
+      };
+    } else {
+      this.ctx.body = {
+        data: "异常",
+        code: 0,
+      };
     }
   }
 }

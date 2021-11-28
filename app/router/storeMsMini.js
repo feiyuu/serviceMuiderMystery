@@ -7,5 +7,15 @@ module.exports = app => {
     router.post('/storeMsMini/registerUser', controller.storeMsMini.user.registerUser)
     router.get('/storeMsMini/getUser', controller.storeMsMini.user.getUser)
     router.get('/storeMsMini/getMineData', controller.storeMsMini.user.getMineData)
+    router.get('/storeMsMini/getBalanceUser', controller.storeMsMini.user.getBalanceUser)
+    router.post('/storeMsMini/payCharge', controller.storeMsMini.user.payCharge)
+    router.post('/storeMsMini/reCharge', controller.storeMsMini.user.reCharge)
     router.get('/storeMsMini/getFilterDramaList', controller.storeMsMini.drama.getFilterDramaList)
+    router.get('/storeMsMini/getDramaDetail', controller.storeMsMini.drama.getDramaDetail)
+    router.get('/storeMsMini/getTeamList', controller.storeMsMini.team.getTeamList)
+    router.get('/storeMsMini/getMyTeamList', controller.storeMsMini.team.getMyTeamList)
+    router.get('/storeMsMini/getTeamDetail', controller.storeMsMini.team.getTeamDetail)
+    router.post('/storeMsMini/joinTeam', controller.storeMsMini.team.joinTeam)
+
+   
 }
