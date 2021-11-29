@@ -47,7 +47,7 @@ class MainController extends Controller {
       if (res.length > 0) {
         //登录成功,进行session缓存
         this.ctx.session.openId = { openId: ID };
-        this.ctx.body = { data: res, code: 1, openid: ID };
+        this.ctx.body = { data: res[0], code: 1, openid: ID };
       } else {
         this.ctx.body = { data: "去注册", code: 2, openid: ID };
       }
@@ -162,6 +162,15 @@ class MainController extends Controller {
         throw err;
       }
     } else {
+
+      let sqlUpdata =
+        "UPDATE users SET integral = integral + " +
+        data.charge +
+        " WHERE openid = '" +
+        data.recordUserId +
+        "'";
+      await this.app.mysql.query(sqlUpdata);
+
       const result = await this.app.mysql.insert("purchase_record", {
         ...data,
         recordTime: new Date(+new Date() + 8 * 3600 * 1000)
@@ -204,7 +213,8 @@ class MainController extends Controller {
     try {
       let sqlUpdata =
         "UPDATE users SET balance = balance + " +
-        data.charge +",integral = integral + " +
+        data.charge +
+        ",integral = integral + " +
         data.charge +
         " WHERE openid = '" +
         data.recordUserId +
@@ -237,39 +247,16 @@ class MainController extends Controller {
       };
     }
   }
-  async joinTeam() {
-    let data = this.ctx.request.body;
-    console.log("datapay=====" + JSON.stringify(data));
-
-    if (
-      data.teamUserId == "undefined" ||
-      data.teamUserId == "" ||
-      data.teamUserId == null
-    ) {
-      this.ctx.body = {
-        data: "请登录后再试",
-        code: 0,
-      };
-      return;
-    }
-    const result = await this.app.mysql.insert("teamusers", {
-      ...data,
-      teamUserJoinTime: new Date(+new Date() + 8 * 3600 * 1000)
-        .toJSON()
-        .substr(0, 19)
-        .replace("T", " "),
+  async getMyPurchaseRecordList() {
+    const queryObj = this.ctx.query;
+    const result = await this.app.mysql.select("purchase_record", {
+      where: { recordUserId: queryObj.openid },
+      orders: [["id", "desc"]],
     });
-    const success = result.affectedRows === 1;
-    if (success) {
-      this.ctx.body = {
-        data: "",
-        code: 1,
-      };
+    if (result) {
+      this.ctx.body = { data: result, code: 1 };
     } else {
-      this.ctx.body = {
-        data: "异常",
-        code: 0,
-      };
+      this.ctx.body = { data: "", code: 2 };
     }
   }
 }

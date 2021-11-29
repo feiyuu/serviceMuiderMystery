@@ -7,5 +7,26 @@ class MainController extends Controller {
     this.ctx.body = "hahahahaha mian";
   }
 
+  async getRooms() {
+    const result = await this.app.mysql.select("rooms", {
+      orders: [["id", "desc"]],
+    });
+    if (result) {
+      this.ctx.body = { data: result, code: 1 };
+    } else {
+      this.ctx.body = { data: "", code: 2 };
+    }
+  }
+  async getDms() {
+    const result = await this.app.mysql.select("controller_users", {
+      where: { grade: 11 },
+      orders: [["id", "asc"]],
+    });
+    if (result) {
+      this.ctx.body = { data: result, code: 1 };
+    } else {
+      this.ctx.body = { data: "", code: 2 };
+    }
+  }
 }
 module.exports = MainController;
