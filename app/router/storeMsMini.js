@@ -23,6 +23,7 @@ module.exports = app => {
     router.post('/storeMsMini/joinTeam', controller.storeMsMini.team.joinTeam)
     router.get('/storeMsMini/getRooms', controller.storeMsMini.store.getRooms)
     router.get('/storeMsMini/getDms', controller.storeMsMini.store.getDms)
+    router.get('/storeMsMini/getGoods', controller.storeMsMini.store.getGoods)
 
    
 }
