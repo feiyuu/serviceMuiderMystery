@@ -24,6 +24,9 @@ module.exports = app => {
     router.get('/storeMsMini/getRooms', controller.storeMsMini.store.getRooms)
     router.get('/storeMsMini/getDms', controller.storeMsMini.store.getDms)
     router.get('/storeMsMini/getGoods', controller.storeMsMini.store.getGoods)
-
+    router.post('/storeMsMini/placeOrder', controller.storeMsMini.store.placeOrder)
+    router.get('/storeMsMini/getMyOrderList', controller.storeMsMini.store.getMyOrderList)
+    router.get('/storeMsMini/getOrderDetail', controller.storeMsMini.store.getOrderDetail)
+    router.post('/storeMsMini/updaTeOrder', controller.storeMsMini.store.updaTeOrder)
    
 }
