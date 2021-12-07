@@ -35,11 +35,7 @@ class MainController extends Controller {
   async getDramaDetail() {
     const data = this.ctx.query;
     let drama = await this.app.mysql.get("dramas", { Id: data.Id });
-    let roles = await this.app.mysql.select("roles", {
-      where: { dramaId: data.Id },
-    });
-    console.log("roles=====" + JSON.stringify(roles));
-    drama.roles = roles;
+    drama.roles = JSON.parse(drama.roles);
 
     let collectSql =
       "SELECT collectDramas FROM users WHERE openid = '" + data.openid + "'";

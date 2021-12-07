@@ -21,22 +21,12 @@ module.exports = (app) => {
     "/storeMsAdmin/getDramaDetail",
     controller.storeMsAdmin.drama.getDramaDetail
   );
-  router.get(
-    "/storeMsAdmin/getHomeDramas",
-    controller.storeMsAdmin.drama.getHomeDramas
-  );
   router.post(
-    "/storeMsAdmin/collectDrama",
-    controller.storeMsAdmin.drama.collectDrama
+    "/storeMsAdmin/updateDrama",
+    controller.storeMsAdmin.drama.updateDrama
   );
-  router.post(
-    "/storeMsAdmin/unCollectDrama",
-    controller.storeMsAdmin.drama.unCollectDrama
-  );
-  router.get(
-    "/storeMsAdmin/getMyCollectDramaList",
-    controller.storeMsAdmin.drama.getMyCollectDramaList
-  );
+
+
   router.get(
     "/storeMsAdmin/getTeamList",
     controller.storeMsAdmin.team.getTeamList
