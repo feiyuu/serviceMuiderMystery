@@ -21,6 +21,10 @@ module.exports = (app) => {
     "/storeMsAdmin/getDramaDetail",
     controller.storeMsAdmin.drama.getDramaDetail
   );
+  router.get(
+    "/storeMsAdmin/getLikeDramaDetail",
+    controller.storeMsAdmin.drama.getLikeDramaDetail
+  );
   router.post(
     "/storeMsAdmin/updateDrama",
     controller.storeMsAdmin.drama.updateDrama
@@ -32,15 +36,13 @@ module.exports = (app) => {
     controller.storeMsAdmin.team.getTeamList
   );
   router.get(
-    "/storeMsAdmin/getMyTeamList",
-    controller.storeMsAdmin.team.getMyTeamList
-  );
-  router.get(
     "/storeMsAdmin/getTeamDetail",
     controller.storeMsAdmin.team.getTeamDetail
   );
-  router.post("/storeMsAdmin/joinTeam", controller.storeMsAdmin.team.joinTeam);
-
+  router.post("/storeMsAdmin/updateTeamState", controller.storeMsAdmin.team.updateTeamState);
+  router.post("/storeMsAdmin/insertTeam", controller.storeMsAdmin.team.insertTeam);
+  router.post("/storeMsAdmin/updateTeam", controller.storeMsAdmin.team.updateTeam);
+  
 
   router.get("/storeMsAdmin/getRooms", controller.storeMsAdmin.store.getRooms);
   router.get("/storeMsAdmin/getRoomDetail", controller.storeMsAdmin.store.getRoomDetail);

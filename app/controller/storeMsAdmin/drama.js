@@ -35,7 +35,7 @@ class MainController extends Controller {
   async getDramaDetail() {
     const data = this.ctx.query;
     let drama = await this.app.mysql.get("dramas", { Id: data.Id });
-    drama.roles = JSON.parse(drama.roles)||[];
+    drama.roles = JSON.parse(drama.roles) || [];
     // let roles = await this.app.mysql.select("roles", {
     //   where: { dramaId: data.Id },
     // });
@@ -43,6 +43,20 @@ class MainController extends Controller {
     // drama.roles = roles;
     if (drama) {
       this.ctx.body = { code: 1, data: drama };
+    } else {
+      this.ctx.body = { code: 2, data: "查询失败" };
+    }
+  }
+
+  async getLikeDramaDetail() {
+    const data = this.ctx.query;
+
+    let sql = "SELECT * FROM dramas WHERE dramaName LIKE '%" + data.likeDramaName+"%' LIMIT 1";
+
+    let result = await this.app.mysql.query(sql);
+
+    if (result.length>0) {
+      this.ctx.body = { code: 1, data: result[0] };
     } else {
       this.ctx.body = { code: 2, data: "查询失败" };
     }
@@ -59,19 +73,17 @@ class MainController extends Controller {
     };
     const result = await this.app.mysql.update("dramas", data, options);
     const updateSuccess = result.affectedRows === 1;
-    if(updateSuccess){
+    if (updateSuccess) {
       this.ctx.body = {
         code: 1,
-        data:'修改成功'
+        data: "修改成功",
       };
-    }else{
+    } else {
       this.ctx.body = {
         code: 0,
-        data:'修改失败'
+        data: "修改失败",
       };
     }
-    
-   
   }
 }
 module.exports = MainController;

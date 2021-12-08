@@ -17,90 +17,132 @@ class MainController extends Controller {
     });
 
     if (result.length > 0) {
-      this.ctx.body = { code: 1, data: result };
-    } else {
-      this.ctx.body = { code: 2, data: "查询失败" };
-    }
-  }
-  async getMyTeamList() {
-    const openid = this.ctx.query.openid;
-    let sql =
-      "SELECT *,organize_team.Id as Id,(SELECT COUNT(*) FROM teamusers WHERE teamusers.organizeTeamId = organize_team.Id )joinedCount FROM organize_team LEFT JOIN dramas ON organize_team.teamDramaId = dramas.Id " +
-      "WHERE organize_team.Id IN (SELECT organizeTeamId FROM teamusers WHERE teamusers.teamUserId = '" +
-      openid +
-      "')" +
-      " ORDER BY organize_team.id DESC ";
+      for (var i = 0; i < result.length; i++) {
+        let teamUsersCountSql =
+          "SELECT COUNT(*) AS count FROM teamUsers WHERE teamUsers.organizeTeamId= " +
+          result[i].Id;
+        let teamUsersCount = await this.app.mysql.query(teamUsersCountSql);
+        result[i].joinedCount = teamUsersCount[0].count;
+      }
 
-    let result = await this.app.mysql.query(sql);
-    if (result) {
       this.ctx.body = { code: 1, data: result };
     } else {
-      this.ctx.body = { code: 2, data: "查询失败" };
+      this.ctx.body = { code: 2, data: [] };
     }
   }
+
   async getTeamDetail() {
-    // "LEFT JOIN rooms ON organize_team.roomId = rooms.Id " +
-
-    const Id = this.ctx.query.Id;
-    let sql =
-      "SELECT * FROM organize_team LEFT JOIN dramas ON organize_team.teamDramaId = dramas.Id " +
-      "LEFT JOIN controller_users ON organize_team.DMId = controller_users.Id " +
-      "WHERE organize_team.Id= " +
-      Id;
-
-    let result = await this.app.mysql.query(sql);
-
-    let roles = await this.app.mysql.select("roles", {
-      where: { dramaId: result[0].teamDramaId },
-    });
-    result[0].roles = roles;
-
-    let sqlusers =
-      "SELECT * FROM teamUsers LEFT JOIN users ON teamUsers.teamUserId = users.openid " +
-      "WHERE teamUsers.organizeTeamId= " +
-      Id;
-    let users = await this.app.mysql.query(sqlusers);
-    result[0].teamUsers = users;
-
+    const params = this.ctx.query;
+    let result = await this.app.mysql.get("organize_team", { Id: params.Id });
     if (result) {
-      this.ctx.body = { code: 1, data: result[0] };
+      let drama = await this.app.mysql.get("dramas", {
+        Id: result.teamDramaId,
+      });
+      result.drama = drama;
+      this.ctx.body = { code: 1, data: result };
     } else {
       this.ctx.body = { code: 2, data: "查询失败" };
     }
   }
-  async joinTeam() {
+  async insertTeam() {
     let data = this.ctx.request.body;
-    console.log("datapay=====" + JSON.stringify(data));
+    console.log("insertTeam=====" + JSON.stringify(data));
 
-    if (
-      data.teamUserId == "undefined" ||
-      data.teamUserId == "" ||
-      data.teamUserId == null
-    ) {
+    //查询同一天同一场次的组局数
+    const sqlExceedTeam =
+      "SELECT COUNT(*) AS count FROM organize_team WHERE startDate = '" +
+      data.startDate +
+      "' AND startSession = '" +
+      data.startSession +
+      "'";
+    const teamCountData = await this.app.mysql.query(sqlExceedTeam);
+    //查询总房间数
+    const sqlExceedRoom = "SELECT COUNT(*) AS count FROM rooms ";
+    const roomCountData = await this.app.mysql.query(sqlExceedRoom);
+
+    //同一天同一场次的组局数不得超过总房间数
+    if (teamCountData[0].count > roomCountData[0].count) {
       this.ctx.body = {
-        data: "请登录后再试",
-        code: 0,
+        data:
+          data.startDate +
+          "" +
+          data.startSession +
+          " 这个场次的组局太多了，房间不够",
+        code: 2,
       };
       return;
     }
-    const result = await this.app.mysql.insert("teamusers", {
-      ...data,
-      teamUserJoinTime: new Date(+new Date() + 8 * 3600 * 1000)
-        .toJSON()
-        .substr(0, 19)
-        .replace("T", " "),
-    });
-    const success = result.affectedRows === 1;
-    if (success) {
-      this.ctx.body = {
-        data: "",
-        code: 1,
-      };
+
+    const result = await this.app.mysql.insert("organize_team", data);
+
+    console.log("insertTeam  result ==  " + JSON.stringify(result));
+    if (result && result.affectedRows === 1) {
+      this.ctx.body = { data: "操作成功", code: 1 };
     } else {
+      this.ctx.body = { data: "", code: 2 };
+    }
+  }
+  async updateTeam() {
+    let data = this.ctx.request.body;
+    console.log("updateTeam=====" + JSON.stringify(data));
+
+    //查询同一天同一场次的组局数
+    const sqlExceedTeam =
+      "SELECT COUNT(*) AS count FROM organize_team WHERE startDate = '" +
+      data.startDate +
+      "' AND startSession = '" +
+      data.startSession +
+      "'";
+    const teamCountData = await this.app.mysql.query(sqlExceedTeam);
+    //查询总房间数
+    const sqlExceedRoom = "SELECT COUNT(*) AS count FROM rooms ";
+    const roomCountData = await this.app.mysql.query(sqlExceedRoom);
+
+    //同一天同一场次的组局数不得超过总房间数
+    if (teamCountData[0].count > roomCountData[0].count) {
       this.ctx.body = {
-        data: "异常",
-        code: 0,
+        data:
+          data.startDate +
+          "" +
+          data.startSession +
+          " 这个场次的组局太多了，房间不够",
+        code: 2,
       };
+      return;
+    }
+
+    let options = {
+      where: {
+        Id: data.Id,
+      },
+    };
+    const result = await this.app.mysql.update("organize_team", data, options);
+
+    console.log("updaTeGoods  result ==  " + JSON.stringify(result));
+    if (result && result.affectedRows === 1) {
+      this.ctx.body = { data: "操作成功", code: 1 };
+    } else {
+      this.ctx.body = { data: "", code: 2 };
+    }
+  }
+  async updateTeamState() {
+    const data = this.ctx.request.body;
+    const result = await this.app.mysql.update(
+      "organize_team",
+      {
+        status: data.state,
+      },
+      {
+        where: {
+          Id: data.TeamId,
+        },
+      }
+    );
+    console.log("updateTeamState  result ==  " + JSON.stringify(result));
+    if (result.affectedRows === 1) {
+      this.ctx.body = { data: "操作成功", code: 1 };
+    } else {
+      this.ctx.body = { data: "", code: 2 };
     }
   }
 }
