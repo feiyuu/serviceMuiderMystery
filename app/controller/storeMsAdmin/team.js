@@ -8,15 +8,15 @@ class MainController extends Controller {
   }
 
   async getTeamList() {
-    const openid = this.ctx.query.openid;
-    let sql =
-      "SELECT *,organize_team.Id as Id,(SELECT COUNT(*) FROM teamusers WHERE teamusers.organizeTeamId = organize_team.Id)joinedCount,(SELECT COUNT(*) FROM teamusers WHERE teamusers.organizeTeamId = organize_team.Id AND teamusers.teamUserId = '" +
-      openid +
-      "')" +
-      "joinedMy FROM organize_team LEFT JOIN dramas ON organize_team.teamDramaId = dramas.Id " +
-      "WHERE organize_team.status= 10 ORDER BY organize_team.id ASC ";
-    let result = await this.app.mysql.query(sql);
-    if (result) {
+    const params = this.ctx.query;
+
+    console.log("getTeamList=====" + JSON.stringify(params));
+    const result = await this.app.mysql.select("organize_team", {
+      where: params,
+      orders: [["id", "DESC"]],
+    });
+
+    if (result.length > 0) {
       this.ctx.body = { code: 1, data: result };
     } else {
       this.ctx.body = { code: 2, data: "查询失败" };

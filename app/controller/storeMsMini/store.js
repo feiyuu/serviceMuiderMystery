@@ -8,6 +8,7 @@ class MainController extends Controller {
   }
   async getGoods() {
     const result = await this.app.mysql.select("goods", {
+      where: { state: 10 },
       orders: [["id", "ASC"]],
     });
     if (result.length > 0) {
@@ -20,7 +21,7 @@ class MainController extends Controller {
     const data = this.ctx.query;
     const result = await this.app.mysql.select("orders", {
       where: {
-        userId: data.openid
+        userId: data.openid,
       },
       orders: [["id", "DESC"]],
     });
@@ -42,16 +43,20 @@ class MainController extends Controller {
   }
   async updaTeOrder() {
     const data = this.ctx.request.body;
-    const result = await this.app.mysql.update("orders",  {
-      state: data.state
-    }, {
-      where: {
-        Id: data.orderId
+    const result = await this.app.mysql.update(
+      "orders",
+      {
+        state: data.state,
+      },
+      {
+        where: {
+          Id: data.orderId,
+        },
       }
-    });
+    );
     console.log("cancelOrder  result ==  " + JSON.stringify(result));
     if (result.affectedRows === 1) {
-      this.ctx.body = { data: "取消成功", code: 1 };
+      this.ctx.body = { data: "操作成功", code: 1 };
     } else {
       this.ctx.body = { data: "", code: 2 };
     }

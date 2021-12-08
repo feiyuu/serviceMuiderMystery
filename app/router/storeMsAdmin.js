@@ -40,20 +40,19 @@ module.exports = (app) => {
     controller.storeMsAdmin.team.getTeamDetail
   );
   router.post("/storeMsAdmin/joinTeam", controller.storeMsAdmin.team.joinTeam);
+
+
   router.get("/storeMsAdmin/getRooms", controller.storeMsAdmin.store.getRooms);
-  router.get("/storeMsAdmin/getDms", controller.storeMsAdmin.store.getDms);
+  router.get("/storeMsAdmin/getRoomDetail", controller.storeMsAdmin.store.getRoomDetail);
+  router.post("/storeMsAdmin/deleteRoom", controller.storeMsAdmin.store.deleteRoom);
+  router.post("/storeMsAdmin/updaTeRoom", controller.storeMsAdmin.store.updaTeRoom);
   router.get("/storeMsAdmin/getGoods", controller.storeMsAdmin.store.getGoods);
-  router.post(
-    "/storeMsAdmin/placeOrder",
-    controller.storeMsAdmin.store.placeOrder
-  );
+  router.post("/storeMsAdmin/deleteGoods", controller.storeMsAdmin.store.deleteGoods);
+  router.post("/storeMsAdmin/updaTeGoods", controller.storeMsAdmin.store.updaTeGoods);
+  router.post("/storeMsAdmin/updaTeGoodsState", controller.storeMsAdmin.store.updaTeGoodsState);
   router.get(
-    "/storeMsAdmin/getMyOrderList",
-    controller.storeMsAdmin.store.getMyOrderList
-  );
-  router.get(
-    "/storeMsAdmin/getOrderDetail",
-    controller.storeMsAdmin.store.getOrderDetail
+    "/storeMsAdmin/getOrderList",
+    controller.storeMsAdmin.store.getOrderList
   );
   router.post(
     "/storeMsAdmin/updaTeOrder",
