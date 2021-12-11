@@ -11,7 +11,8 @@
     "egg-cors": "^2.2.3",
     "egg-mysql": "^3.0.0",
     "egg-scripts": "^2.11.0",
-    "lsof": "^0.1.0"
+    "lsof": "^0.1.0",
+    "qiniu": "^7.4.0"
   },
   "devDependencies": {
     "autod": "^3.0.1",

@@ -7,6 +7,8 @@ module.exports = (app) => {
     "/storeMsAdmin/checkControllerUserLogin",
     controller.storeMsAdmin.user.checkControllerUserLogin
   );
+  router.post("/storeMsAdmin/checkUserPsw", controller.storeMsAdmin.user.checkUserPsw);
+
   router.get("/storeMsAdmin/getDMUsers", controller.storeMsAdmin.user.getDMUsers);
   router.get("/storeMsAdmin/getUser", controller.storeMsAdmin.user.getUser);
   router.post("/storeMsAdmin/updateUser", controller.storeMsAdmin.user.updateUser);
@@ -28,6 +30,10 @@ module.exports = (app) => {
   router.post(
     "/storeMsAdmin/updateDrama",
     controller.storeMsAdmin.drama.updateDrama
+  );
+  router.post(
+    "/storeMsAdmin/inertDrama",
+    controller.storeMsAdmin.drama.inertDrama
   );
 
 

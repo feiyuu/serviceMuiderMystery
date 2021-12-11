@@ -26,6 +26,23 @@ class MainController extends Controller {
       this.ctx.body = { data: "登录失败", code: 2 };
     }
   }
+  async checkUserPsw() {
+    let Id = this.ctx.request.body.Id;
+    let password = this.ctx.request.body.password;
+    const sql =
+      " SELECT * FROM controller_users WHERE Id = '" +
+      Id +
+      "' AND loginPsw = '" +
+      password +
+      "'";
+
+    const res = await this.app.mysql.query(sql);
+    if (res.length > 0) {
+      this.ctx.body = { data: "校验通过", code: 1 };
+    } else {
+      this.ctx.body = { data: "登录失败", code: 2 };
+    }
+  }
   async getDMUsers() {
     const sql =
       " SELECT * FROM controller_users WHERE grade = 11 ORDER BY Id ASC";
@@ -38,8 +55,7 @@ class MainController extends Controller {
   }
   async getUser() {
     const queryObj = this.ctx.query;
-    console.log("getUser==="+JSON.stringify(queryObj));
-    console.log("getUser==="+queryObj.Id);
+    console.log("getUser===" + JSON.stringify(queryObj));
     const sql =
       " SELECT * FROM controller_users WHERE controller_users.Id = '" +
       queryObj.Id +
@@ -51,14 +67,14 @@ class MainController extends Controller {
       this.ctx.body = { data: "登录失败", code: 0 };
     }
   }
-  
+
   async updateUser() {
     const user = this.ctx.request.body;
-    console.log("updateUser==="+JSON.stringify(user));
+    console.log("updateUser===" + JSON.stringify(user));
     const result = await this.app.mysql.update(
       "controller_users",
       {
-        ...user
+        ...user,
       },
       {
         where: {
@@ -67,7 +83,7 @@ class MainController extends Controller {
       }
     );
 
-     if (result.affectedRows === 1) {
+    if (result.affectedRows === 1) {
       this.ctx.body = { data: "修改成功", code: 1 };
     } else {
       this.ctx.body = { data: "修改失败", code: 0 };
@@ -75,35 +91,27 @@ class MainController extends Controller {
   }
   async inertUser() {
     const user = this.ctx.request.body;
-    console.log("updateUser==="+JSON.stringify(user));
-    const result = await this.app.mysql.insert(
-      "controller_users",
-      {
-        ...user
-      }
-    );
+    console.log("updateUser===" + JSON.stringify(user));
+    const result = await this.app.mysql.insert("controller_users", {
+      ...user,
+    });
 
-     if (result.affectedRows === 1) {
+    if (result.affectedRows === 1) {
       this.ctx.body = { data: "创建成功", code: 1 };
     } else {
       this.ctx.body = { data: "创建失败", code: 0 };
     }
   }
-  
+
   async autoId() {
-    const sql =
-      " SELECT COUNT(Id)count FROM controller_users";
+    const sql = " SELECT COUNT(Id)count FROM controller_users";
     const res = await this.app.mysql.query(sql);
-    console.log("res=== "+JSON.stringify(res));
-    if (res.length>0) {
-      this.ctx.body = { data: "dm00"+res[0].count, code: 1 };
+    console.log("res=== " + JSON.stringify(res));
+    if (res.length > 0) {
+      this.ctx.body = { data: "dm00" + res[0].count, code: 1 };
     } else {
       this.ctx.body = { data: "登录失败", code: 0 };
     }
   }
-
-
-
-
 }
 module.exports = MainController;

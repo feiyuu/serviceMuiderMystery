@@ -15,9 +15,24 @@ class MainController extends Controller {
       "')" +
       "joinedMy FROM organize_team LEFT JOIN dramas ON organize_team.teamDramaId = dramas.Id " +
       "WHERE organize_team.status= 10 ORDER BY organize_team.id ASC ";
-    let result = await this.app.mysql.query(sql);
-    if (result) {
-      this.ctx.body = { code: 1, data: result };
+    let results = await this.app.mysql.query(sql);
+    if (results) {
+      for (let i = 0; i < results.length; i++) {
+        if (results[i].addTime) {
+          let dateAdd = new Date(
+            Date.parse(results[i].addTime.replace(/-/g, "/"))
+          );
+          var day =
+            (new Date().getTime() - dateAdd.getTime()) / (1000 * 60 * 60 * 24);
+          console.log("day============" + day + results[i].dramaName);
+          if (day > 7) {
+            results[i].isNew = 0;
+          } else {
+            results[i].isNew = 1;
+          }
+        }
+      }
+      this.ctx.body = { code: 1, data: results };
     } else {
       this.ctx.body = { code: 2, data: "查询失败" };
     }
@@ -31,9 +46,24 @@ class MainController extends Controller {
       "')" +
       " ORDER BY organize_team.id DESC ";
 
-    let result = await this.app.mysql.query(sql);
-    if (result) {
-      this.ctx.body = { code: 1, data: result };
+    let results = await this.app.mysql.query(sql);
+    if (results) {
+      for (let i = 0; i < results.length; i++) {
+        if (results[i].addTime) {
+          let dateAdd = new Date(
+            Date.parse(results[i].addTime.replace(/-/g, "/"))
+          );
+          var day =
+            (new Date().getTime() - dateAdd.getTime()) / (1000 * 60 * 60 * 24);
+          console.log("day============" + day + results[i].dramaName);
+          if (day > 7) {
+            results[i].isNew = 0;
+          } else {
+            results[i].isNew = 1;
+          }
+        }
+      }
+      this.ctx.body = { code: 1, data: results };
     } else {
       this.ctx.body = { code: 2, data: "查询失败" };
     }
@@ -62,7 +92,23 @@ class MainController extends Controller {
     let users = await this.app.mysql.query(sqlusers);
     result[0].teamUsers = users;
 
-    if (result) {
+    if (result.length > 0) {
+      for (let i = 0; i < result.length; i++) {
+        if (result[i].addTime) {
+          let dateAdd = new Date(
+            Date.parse(result[i].addTime.replace(/-/g, "/"))
+          );
+          var day =
+            (new Date().getTime() - dateAdd.getTime()) / (1000 * 60 * 60 * 24);
+          console.log("day============" + day + result[i].dramaName);
+          if (day > 7) {
+            result[i].isNew = 0;
+          } else {
+            result[i].isNew = 1;
+          }
+        }
+      }
+
       this.ctx.body = { code: 1, data: result[0] };
     } else {
       this.ctx.body = { code: 2, data: "查询失败" };

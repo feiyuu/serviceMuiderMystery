@@ -19,7 +19,7 @@ class MainController extends Controller {
     const results = await this.app.mysql.select("dramas", {
       where: JSON.parse(data.filters),
       orders: [
-        ["id", "asc"], //降序desc，升序asc
+        ["id", "desc"], //降序desc，升序asc
       ],
       limit: Number(data.pageSize), //查询条数
       offset: Number(data.page) * Number(data.pageSize) - Number(data.pageSize), //数据偏移量（分页查询使用）
@@ -27,6 +27,21 @@ class MainController extends Controller {
 
     // console.log(results);
     if (results.length > 0) {
+      for (let i = 0; i < results.length; i++) {
+        if (results[i].addTime) {
+          let dateAdd = new Date(
+            Date.parse(results[i].addTime.replace(/-/g, "/"))
+          );
+          var day =
+            (new Date().getTime() - dateAdd.getTime()) / (1000 * 60 * 60 * 24);
+          console.log("day============" + day + results[i].dramaName);
+          if (day > 7) {
+            results[i].isNew = 0;
+          } else {
+            results[i].isNew = 1;
+          }
+        }
+      }
       this.ctx.body = { code: 1, data: results };
     } else {
       this.ctx.body = { code: 1, data: [] };
@@ -35,7 +50,7 @@ class MainController extends Controller {
   async getDramaDetail() {
     const data = this.ctx.query;
     let drama = await this.app.mysql.get("dramas", { Id: data.Id });
-    drama.roles = JSON.parse(drama.roles)||[];
+    drama.roles = JSON.parse(drama.roles) || [];
 
     let collectSql =
       "SELECT collectDramas FROM users WHERE openid = '" + data.openid + "'";
@@ -52,6 +67,19 @@ class MainController extends Controller {
     console.log("collectDramas=============" + collectDramas);
     drama.isCollect = index != -1;
     if (drama) {
+      if (drama.addTime) {
+        if (drama.addTime) {
+          let dateAdd = new Date(Date.parse(drama.addTime.replace(/-/g, "/")));
+          var day =
+            (new Date().getTime() - dateAdd.getTime()) / (1000 * 60 * 60 * 24);
+          console.log("day============" + day + drama.dramaName);
+          if (day > 7) {
+            drama.isNew = 0;
+          } else {
+            drama.isNew = 1;
+          }
+        }
+      }
       this.ctx.body = { code: 1, data: drama };
     } else {
       this.ctx.body = { code: 2, data: "查询失败" };
@@ -62,84 +90,14 @@ class MainController extends Controller {
       limit: 6,
       orders: [["id", "desc"]],
     });
+
     if (result) {
       this.ctx.body = { data: result, code: 1 };
     } else {
       this.ctx.body = { data: "", code: 2 };
     }
   }
-  async collectDrama() {
-    let data = this.ctx.request.body;
-    console.log("datacollectDrama=====" + JSON.stringify(data));
-    if (
-      data.openid == "undefined" ||
-      data.openid == "" ||
-      data.openid == null
-    ) {
-      this.ctx.body = {
-        data: "请登录后再试",
-        code: 0,
-      };
-      return;
-    }
 
-    let collectSql =
-      "SELECT collectDramas FROM users WHERE openid = '" + data.openid + "'";
-    let collectDramas = await this.app.mysql.query(collectSql);
-    collectDramas = collectDramas[0].collectDramas;
-    console.log("collectDramas=============" + collectDramas);
-    let collectArray = collectDramas.split(":");
-    collectArray = collectArray.filter(function (s) {
-      return s && s.trim();
-    });
-    console.log("collectArray=============" + collectArray);
-    const index = collectArray.indexOf(data.dramaId);
-    console.log("index=============" + index);
-    console.log("collectDramas=============" + collectDramas);
-
-    if (index == -1) {
-      collectDramas = collectDramas + ":" + data.dramaId;
-      console.log("indexcollectDramas=============" + collectDramas);
-      const result = await this.app.mysql.update(
-        "users",
-        {
-          collectDramas: collectDramas,
-        },
-        {
-          where: {
-            openid: data.openid,
-          },
-        }
-      );
-      if (result.affectedRows === 1) {
-        this.ctx.body = {
-          data: "收藏成功",
-          code: 1,
-        };
-      } else {
-        this.ctx.body = {
-          data: "异常",
-          code: 0,
-        };
-      }
-    } else {
-      this.ctx.body = {
-        data: "已收藏",
-        code: 0,
-      };
-    }
-  }
-  async getHomeDramas() {
-    const result = await this.app.mysql.select("dramas", {
-      limit: 6,
-      orders: [["id", "desc"]],
-    });
-    if (result) {
-      this.ctx.body = { data: result, code: 1 };
-    } else {
-      this.ctx.body = { data: "", code: 2 };
-    }
-  }
   async collectDrama() {
     let data = this.ctx.request.body;
     console.log("datacollectDrama=====" + JSON.stringify(data));
@@ -283,10 +241,25 @@ class MainController extends Controller {
 
     const sql =
       "SELECT * FROM dramas WHERE Id IN (" + collectArray.toString() + ")";
-    const result = await this.app.mysql.query(sql);
+    const results = await this.app.mysql.query(sql);
 
-    if (result.length > 0) {
-      this.ctx.body = { data: result, code: 1 };
+    if (results.length > 0) {
+      for (let i = 0; i < results.length; i++) {
+        if (results[i].addTime) {
+          let dateAdd = new Date(
+            Date.parse(results[i].addTime.replace(/-/g, "/"))
+          );
+          var day =
+            (new Date().getTime() - dateAdd.getTime()) / (1000 * 60 * 60 * 24);
+          console.log("day============" + day + results[i].dramaName);
+          if (day > 7) {
+            results[i].isNew = 0;
+          } else {
+            results[i].isNew = 1;
+          }
+        }
+      }
+      this.ctx.body = { data: results, code: 1 };
     } else {
       this.ctx.body = { data: [], code: 1 };
     }

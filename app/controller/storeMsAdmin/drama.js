@@ -51,11 +51,14 @@ class MainController extends Controller {
   async getLikeDramaDetail() {
     const data = this.ctx.query;
 
-    let sql = "SELECT * FROM dramas WHERE dramaName LIKE '%" + data.likeDramaName+"%' LIMIT 1";
+    let sql =
+      "SELECT * FROM dramas WHERE dramaName LIKE '%" +
+      data.likeDramaName +
+      "%' LIMIT 1";
 
     let result = await this.app.mysql.query(sql);
 
-    if (result.length>0) {
+    if (result.length > 0) {
       this.ctx.body = { code: 1, data: result[0] };
     } else {
       this.ctx.body = { code: 2, data: "查询失败" };
@@ -83,6 +86,21 @@ class MainController extends Controller {
         code: 0,
         data: "修改失败",
       };
+    }
+  }
+  async inertDrama() {
+    const data = this.ctx.request.body;
+    data.roles = JSON.stringify(data.roles);
+    // console.log("inertDrama===" + JSON.stringify(data));
+    let now = new Date(Date.now());
+    data.addTime =
+      now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+    const result = await this.app.mysql.insert("dramas", data);
+
+    if (result.affectedRows === 1) {
+      this.ctx.body = { data: "创建成功", code: 1 };
+    } else {
+      this.ctx.body = { data: "创建失败", code: 0 };
     }
   }
 }
