@@ -80,19 +80,17 @@ class MainController extends Controller {
 
     let result = await this.app.mysql.query(sql);
 
-    let roles = await this.app.mysql.select("roles", {
-      where: { dramaId: result[0].teamDramaId },
-    });
-    result[0].roles = roles;
-
-    let sqlusers =
-      "SELECT * FROM teamUsers LEFT JOIN users ON teamUsers.teamUserId = users.openid " +
-      "WHERE teamUsers.organizeTeamId= " +
-      Id;
-    let users = await this.app.mysql.query(sqlusers);
-    result[0].teamUsers = users;
-
     if (result.length > 0) {
+      //解析roles json
+      result[0].roles = JSON.parse(result[0].roles) || [];
+      //从uer表中查询参与组局的用户信息
+      let sqlusers =
+        "SELECT * FROM teamUsers LEFT JOIN users ON teamUsers.teamUserId = users.openid " +
+        "WHERE teamUsers.organizeTeamId= " +
+        Id;
+      let users = await this.app.mysql.query(sqlusers);
+      result[0].teamUsers = users;
+      //超过七天非新上架
       for (let i = 0; i < result.length; i++) {
         if (result[i].addTime) {
           let dateAdd = new Date(

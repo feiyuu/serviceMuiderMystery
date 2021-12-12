@@ -23,7 +23,7 @@ module.exports = (appInfo) => {
       // password
       password: "12345678",
       // database
-      database: "script_store_ms",
+      database: "script-store-ms",
     },
     // load into app, default is open
     app: true,

@@ -19,7 +19,7 @@ class MainController extends Controller {
     const results = await this.app.mysql.select("dramas", {
       where: JSON.parse(data.filters),
       orders: [
-        ["id", "asc"], //降序desc，升序asc
+        ["id", "desc"], //降序desc，升序asc
       ],
       limit: Number(data.pageSize), //查询条数
       offset: Number(data.page) * Number(data.pageSize) - Number(data.pageSize), //数据偏移量（分页查询使用）
@@ -62,6 +62,19 @@ class MainController extends Controller {
       this.ctx.body = { code: 1, data: result[0] };
     } else {
       this.ctx.body = { code: 2, data: "查询失败" };
+    }
+  }
+  
+  async deleteDrama() {
+    const data = this.ctx.request.body;
+    console.log("deleteDrama=====" + JSON.stringify(data));
+    const result = await this.app.mysql.delete("dramas", {
+      Id: data.dramaId,
+    });
+    if (result.affectedRows === 1) {
+      this.ctx.body = { data: "删除成功", code: 1 };
+    } else {
+      this.ctx.body = { data: "删除失败", code: 2 };
     }
   }
   async updateDrama() {

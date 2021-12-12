@@ -8,13 +8,11 @@ module.exports = (app) => {
     controller.storeMsAdmin.user.checkControllerUserLogin
   );
   router.post("/storeMsAdmin/checkUserPsw", controller.storeMsAdmin.user.checkUserPsw);
-
   router.get("/storeMsAdmin/getDMUsers", controller.storeMsAdmin.user.getDMUsers);
   router.get("/storeMsAdmin/getUser", controller.storeMsAdmin.user.getUser);
   router.post("/storeMsAdmin/updateUser", controller.storeMsAdmin.user.updateUser);
   router.post("/storeMsAdmin/inertUser", controller.storeMsAdmin.user.inertUser);
   router.get("/storeMsAdmin/autoId", controller.storeMsAdmin.user.autoId);
-
   router.get(
     "/storeMsAdmin/getFilterDramaList",
     controller.storeMsAdmin.drama.getFilterDramaList
@@ -35,8 +33,10 @@ module.exports = (app) => {
     "/storeMsAdmin/inertDrama",
     controller.storeMsAdmin.drama.inertDrama
   );
-
-
+  router.post(
+    "/storeMsAdmin/deleteDrama",
+    controller.storeMsAdmin.drama.deleteDrama
+  );
   router.get(
     "/storeMsAdmin/getTeamList",
     controller.storeMsAdmin.team.getTeamList
@@ -48,8 +48,6 @@ module.exports = (app) => {
   router.post("/storeMsAdmin/updateTeamState", controller.storeMsAdmin.team.updateTeamState);
   router.post("/storeMsAdmin/insertTeam", controller.storeMsAdmin.team.insertTeam);
   router.post("/storeMsAdmin/updateTeam", controller.storeMsAdmin.team.updateTeam);
-  
-
   router.get("/storeMsAdmin/getRooms", controller.storeMsAdmin.store.getRooms);
   router.get("/storeMsAdmin/getRoomDetail", controller.storeMsAdmin.store.getRoomDetail);
   router.post("/storeMsAdmin/deleteRoom", controller.storeMsAdmin.store.deleteRoom);

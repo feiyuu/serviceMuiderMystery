@@ -140,6 +140,7 @@ class MainController extends Controller {
     if (data.isBlance == "true") {
       const conn = await this.app.mysql.beginTransaction();
       try {
+        //扣除余额
         let sqlUpdata =
           "UPDATE users SET balance = balance - " +
           data.charge +
@@ -147,6 +148,7 @@ class MainController extends Controller {
           data.recordUserId +
           "'";
         await conn.query(sqlUpdata);
+        //插入资金明细记录
         await conn.insert("purchase_record", {
           ...data,
           recordTime: new Date(+new Date() + 8 * 3600 * 1000)
@@ -162,7 +164,7 @@ class MainController extends Controller {
         throw err;
       }
     } else {
-
+      //微信支付加积分
       let sqlUpdata =
         "UPDATE users SET integral = integral + " +
         data.charge +
@@ -170,7 +172,7 @@ class MainController extends Controller {
         data.recordUserId +
         "'";
       await this.app.mysql.query(sqlUpdata);
-
+      //插入资金明细记录
       const result = await this.app.mysql.insert("purchase_record", {
         ...data,
         recordTime: new Date(+new Date() + 8 * 3600 * 1000)
@@ -211,6 +213,7 @@ class MainController extends Controller {
     let success = false;
     const conn = await this.app.mysql.beginTransaction();
     try {
+      //充值
       let sqlUpdata =
         "UPDATE users SET balance = balance + " +
         data.charge +
@@ -220,6 +223,7 @@ class MainController extends Controller {
         data.recordUserId +
         "'";
       await conn.query(sqlUpdata);
+      //插入充值资金明细记录
       await conn.insert("purchase_record", {
         ...data,
         recordTime: new Date(+new Date() + 8 * 3600 * 1000)

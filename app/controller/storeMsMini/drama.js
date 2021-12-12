@@ -9,13 +9,6 @@ class MainController extends Controller {
   async getFilterDramaList() {
     const data = this.ctx.query;
     console.log("data=====" + JSON.stringify(data));
-    console.log("filters=====" + data.filters);
-    console.log("offset111=====" + Number(data.page) * Number(data.pageSize));
-    console.log(
-      "offset=====" +
-        (Number(data.page) * Number(data.pageSize) - Number(data.pageSize))
-    );
-
     const results = await this.app.mysql.select("dramas", {
       where: JSON.parse(data.filters),
       orders: [
@@ -25,8 +18,8 @@ class MainController extends Controller {
       offset: Number(data.page) * Number(data.pageSize) - Number(data.pageSize), //数据偏移量（分页查询使用）
     });
 
-    // console.log(results);
     if (results.length > 0) {
+      //超过七天，不是新上架
       for (let i = 0; i < results.length; i++) {
         if (results[i].addTime) {
           let dateAdd = new Date(
@@ -52,21 +45,21 @@ class MainController extends Controller {
     let drama = await this.app.mysql.get("dramas", { Id: data.Id });
     drama.roles = JSON.parse(drama.roles) || [];
 
+    //用户收藏的剧本
     let collectSql =
       "SELECT collectDramas FROM users WHERE openid = '" + data.openid + "'";
     let collectDramas = await this.app.mysql.query(collectSql);
     collectDramas = collectDramas[0].collectDramas;
-    console.log("collectDramas=============" + collectDramas);
     let collectArray = collectDramas.split(":");
     collectArray = collectArray.filter(function (s) {
       return s && s.trim();
     });
-    console.log("collectArray=============" + collectArray);
     const index = collectArray.indexOf(data.Id);
-    console.log("index=============" + index);
-    console.log("collectDramas=============" + collectDramas);
     drama.isCollect = index != -1;
+
+
     if (drama) {
+      //超过七天不是新上架
       if (drama.addTime) {
         if (drama.addTime) {
           let dateAdd = new Date(Date.parse(drama.addTime.replace(/-/g, "/")));
@@ -112,24 +105,19 @@ class MainController extends Controller {
       };
       return;
     }
-
+    //是否收藏
     let collectSql =
       "SELECT collectDramas FROM users WHERE openid = '" + data.openid + "'";
     let collectDramas = await this.app.mysql.query(collectSql);
     collectDramas = collectDramas[0].collectDramas;
-    console.log("collectDramas=============" + collectDramas);
     let collectArray = collectDramas.split(":");
     collectArray = collectArray.filter(function (s) {
       return s && s.trim();
     });
-    console.log("collectArray=============" + collectArray);
     const index = collectArray.indexOf(data.dramaId);
-    console.log("index=============" + index);
-    console.log("collectDramas=============" + collectDramas);
 
     if (index == -1) {
       collectDramas = collectDramas + ":" + data.dramaId;
-      console.log("indexcollectDramas=============" + collectDramas);
       const result = await this.app.mysql.update(
         "users",
         {
@@ -173,27 +161,23 @@ class MainController extends Controller {
       };
       return;
     }
-
+    //是否收藏
     let collectSql =
       "SELECT collectDramas FROM users WHERE openid = '" + data.openid + "'";
     let collectDramas = await this.app.mysql.query(collectSql);
     collectDramas = collectDramas[0].collectDramas;
-    console.log("collectDramas=============" + collectDramas);
     let collectArray = collectDramas.split(":");
     collectArray = collectArray.filter(function (s) {
       return s && s.trim();
     });
-    console.log("collectArray=============" + collectArray);
     const index = collectArray.indexOf(data.dramaId);
-    console.log("index=============" + index);
-    console.log("collectDramas=============" + collectDramas);
 
     if (index != -1) {
+      //已收藏就移除
       delete collectArray[index];
       collectArray = collectArray.filter(function (s) {
         return s && s.trim();
       });
-      console.log("indexcollectDramas=============" + collectArray);
       collectDramas = collectArray.join(":");
       const result = await this.app.mysql.update(
         "users",
@@ -227,13 +211,13 @@ class MainController extends Controller {
   async getMyCollectDramaList() {
     const queryObj = this.ctx.query;
 
+    //取出收藏剧本列表
     let collectSql =
       "SELECT collectDramas FROM users WHERE openid = '" +
       queryObj.openid +
       "'";
     let collectDramas = await this.app.mysql.query(collectSql);
     collectDramas = collectDramas[0].collectDramas;
-    console.log("collectDramas=============" + collectDramas);
     let collectArray = collectDramas.split(":");
     collectArray = collectArray.filter(function (s) {
       return s && s.trim();
@@ -244,6 +228,7 @@ class MainController extends Controller {
     const results = await this.app.mysql.query(sql);
 
     if (results.length > 0) {
+      //超过七天为非新上架
       for (let i = 0; i < results.length; i++) {
         if (results[i].addTime) {
           let dateAdd = new Date(
