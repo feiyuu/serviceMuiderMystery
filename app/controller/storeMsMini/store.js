@@ -80,7 +80,7 @@ class MainController extends Controller {
           "&content=" +
           content +
           data.room +
-          "房间的用户刚刚在小卖铺消费了一笔订单";
+          "房间的用户刚刚支付了一笔订单";
 
         var req = http.request(options, (res) => {
           res.setEncoding("utf8");

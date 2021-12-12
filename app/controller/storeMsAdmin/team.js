@@ -127,6 +127,15 @@ class MainController extends Controller {
   }
   async updateTeamState() {
     const data = this.ctx.request.body;
+
+    if(data.state == 30){
+      let sqlUpdata =
+        "UPDATE controller_users SET dmHot = dmHot + 1 WHERE Id = '" +
+        data.dmId +
+        "'";
+      await this.app.mysql.query(sqlUpdata);
+    }
+
     const result = await this.app.mysql.update(
       "organize_team",
       {
