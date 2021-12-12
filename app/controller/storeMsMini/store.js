@@ -1,4 +1,18 @@
 "use strict";
+var http = require("http");
+
+var appkey = "BC-1a482e3ac1ad499bbf4908be6d90b340";
+var channel = "17jbs-order";
+var content = "";
+
+var options = {
+  hostname: "rest-hangzhou.goeasy.io",
+  path: "/publish",
+  method: "POST",
+  headers: {
+    "Content-Type": "application/x-www-form-urlencoded",
+  },
+};
 
 const Controller = require("egg").Controller;
 
@@ -47,6 +61,7 @@ class MainController extends Controller {
       "orders",
       {
         state: data.state,
+        room: data.room,
       },
       {
         where: {
@@ -56,6 +71,30 @@ class MainController extends Controller {
     );
     console.log("cancelOrder  result ==  " + JSON.stringify(result));
     if (result.affectedRows === 1) {
+      if (data.state == 30) {
+        var queryParams =
+          "appkey=" +
+          appkey +
+          "&channel=" +
+          channel +
+          "&content=" +
+          content +
+          data.room +
+          "房间的用户刚刚在小卖铺消费了一笔订单";
+
+        var req = http.request(options, (res) => {
+          res.setEncoding("utf8");
+          res.on("data", (result) => {
+            console.log(`响应结果: ${result}`);
+          });
+        });
+        req.on("error", (e) => {
+          console.error(e);
+        });
+        req.write(queryParams);
+        req.end();
+      }
+
       this.ctx.body = { data: "操作成功", code: 1 };
     } else {
       this.ctx.body = { data: "", code: 2 };

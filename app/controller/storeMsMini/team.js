@@ -14,7 +14,7 @@ class MainController extends Controller {
       openid +
       "')" +
       "joinedMy FROM organize_team LEFT JOIN dramas ON organize_team.teamDramaId = dramas.Id " +
-      "WHERE organize_team.status= 10 ORDER BY organize_team.id ASC ";
+      "WHERE organize_team.status= 10 ORDER BY organize_team.id DESC ";
     let results = await this.app.mysql.query(sql);
     if (results) {
       for (let i = 0; i < results.length; i++) {
