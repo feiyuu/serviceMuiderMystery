@@ -1,7 +1,8 @@
-module.exports = app => {
-    const { router, controller } = app;
-    router.get(
-        "/common/getPicAuth",
-        controller.common.getPicAuth
-      );
-}
+module.exports = (app) => {
+  const { router, controller, middleware } = app;
+  router.get(
+    "/common/getPicAuth",
+    middleware.jwt("admin"),
+    controller.common.getPicAuth
+  );
+};
