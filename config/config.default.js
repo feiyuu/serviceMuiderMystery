@@ -47,7 +47,11 @@ module.exports = (appInfo) => {
 
   // add your middleware config here
   config.middleware = [];
-
+  //token jwt
+  config.jwt = {
+    secretMini: 'openid',
+    secretAdmin: 'loginName',
+  };
   // add your user config here
   const userConfig = {
     // myAppName: 'egg',

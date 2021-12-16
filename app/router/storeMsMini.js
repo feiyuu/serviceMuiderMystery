@@ -1,32 +1,133 @@
-module.exports = app => {
-    const { router, controller } = app;
-    var adminauth = app.middleware.adminauth(); //中间件，路由守卫
-    router.get('/storeMsMini/index', controller.storeMsMini.user.index)
-    router.get('/storeMsMini/checkUserLogin', controller.storeMsMini.user.checkUserLogin)
-    router.get('/storeMsMini/checkControllerUserLogin', controller.storeMsMini.user.checkControllerUserLogin)
-    router.post('/storeMsMini/registerUser', controller.storeMsMini.user.registerUser)
-    router.get('/storeMsMini/getUser', controller.storeMsMini.user.getUser)
-    router.get('/storeMsMini/getMineData', controller.storeMsMini.user.getMineData)
-    router.get('/storeMsMini/getBalanceUser', controller.storeMsMini.user.getBalanceUser)
-    router.post('/storeMsMini/payCharge', controller.storeMsMini.user.payCharge)
-    router.post('/storeMsMini/reCharge', controller.storeMsMini.user.reCharge)
-    router.get('/storeMsMini/getMyPurchaseRecordList', controller.storeMsMini.user.getMyPurchaseRecordList)
-    router.get('/storeMsMini/getFilterDramaList', controller.storeMsMini.drama.getFilterDramaList)
-    router.get('/storeMsMini/getDramaDetail', controller.storeMsMini.drama.getDramaDetail)
-    router.get('/storeMsMini/getHomeDramas', controller.storeMsMini.drama.getHomeDramas)
-    router.post('/storeMsMini/collectDrama', controller.storeMsMini.drama.collectDrama)
-    router.post('/storeMsMini/unCollectDrama', controller.storeMsMini.drama.unCollectDrama)
-    router.get('/storeMsMini/getMyCollectDramaList', controller.storeMsMini.drama.getMyCollectDramaList)
-    router.get('/storeMsMini/getTeamList', controller.storeMsMini.team.getTeamList)
-    router.get('/storeMsMini/getMyTeamList', controller.storeMsMini.team.getMyTeamList)
-    router.get('/storeMsMini/getTeamDetail', controller.storeMsMini.team.getTeamDetail)
-    router.post('/storeMsMini/joinTeam', controller.storeMsMini.team.joinTeam)
-    router.get('/storeMsMini/getRooms', controller.storeMsMini.store.getRooms)
-    router.get('/storeMsMini/getDms', controller.storeMsMini.store.getDms)
-    router.get('/storeMsMini/getGoods', controller.storeMsMini.store.getGoods)
-    router.post('/storeMsMini/placeOrder', controller.storeMsMini.store.placeOrder)
-    router.get('/storeMsMini/getMyOrderList', controller.storeMsMini.store.getMyOrderList)
-    router.get('/storeMsMini/getOrderDetail', controller.storeMsMini.store.getOrderDetail)
-    router.post('/storeMsMini/updaTeOrder', controller.storeMsMini.store.updaTeOrder)
-   
-}
+module.exports = (app) => {
+  const { router, controller, middleware } = app;
+  router.get(
+    "/storeMsMini/index",
+    middleware.jwt("mini"),
+    controller.storeMsMini.user.index
+  );
+  router.get(
+    "/storeMsMini/checkUserLogin",
+    middleware.jwt("mini"),
+    controller.storeMsMini.user.checkUserLogin
+  );
+  router.post(
+    "/storeMsMini/registerUser",
+    middleware.jwt("mini"),
+    controller.storeMsMini.user.registerUser
+  );
+  router.get(
+    "/storeMsMini/getUser",
+    middleware.jwt("mini"),
+    controller.storeMsMini.user.getUser
+  );
+  router.get(
+    "/storeMsMini/getMineData",
+    middleware.jwt("mini"),
+    controller.storeMsMini.user.getMineData
+  );
+  router.get(
+    "/storeMsMini/getBalanceUser",
+    middleware.jwt("mini"),
+    controller.storeMsMini.user.getBalanceUser
+  );
+  router.post(
+    "/storeMsMini/payCharge",
+    middleware.jwt("mini"),
+    controller.storeMsMini.user.payCharge
+  );
+  router.post(
+    "/storeMsMini/reCharge",
+    middleware.jwt("mini"),
+    controller.storeMsMini.user.reCharge
+  );
+  router.get(
+    "/storeMsMini/getMyPurchaseRecordList",
+    middleware.jwt("mini"),
+    controller.storeMsMini.user.getMyPurchaseRecordList
+  );
+  router.get(
+    "/storeMsMini/getFilterDramaList",
+    middleware.jwt("mini"),
+    controller.storeMsMini.drama.getFilterDramaList
+  );
+  router.get(
+    "/storeMsMini/getDramaDetail",
+    middleware.jwt("mini"),
+    controller.storeMsMini.drama.getDramaDetail
+  );
+  router.get(
+    "/storeMsMini/getHomeDramas",
+    middleware.jwt("mini"),
+    controller.storeMsMini.drama.getHomeDramas
+  );
+  router.post(
+    "/storeMsMini/collectDrama",
+    middleware.jwt("mini"),
+    controller.storeMsMini.drama.collectDrama
+  );
+  router.post(
+    "/storeMsMini/unCollectDrama",
+    middleware.jwt("mini"),
+    controller.storeMsMini.drama.unCollectDrama
+  );
+  router.get(
+    "/storeMsMini/getMyCollectDramaList",
+    middleware.jwt("mini"),
+    controller.storeMsMini.drama.getMyCollectDramaList
+  );
+  router.get(
+    "/storeMsMini/getTeamList",
+    middleware.jwt("mini"),
+    controller.storeMsMini.team.getTeamList
+  );
+  router.get(
+    "/storeMsMini/getMyTeamList",
+    middleware.jwt("mini"),
+    controller.storeMsMini.team.getMyTeamList
+  );
+  router.get(
+    "/storeMsMini/getTeamDetail",
+    middleware.jwt("mini"),
+    controller.storeMsMini.team.getTeamDetail
+  );
+  router.post(
+    "/storeMsMini/joinTeam",
+    middleware.jwt("mini"),
+    controller.storeMsMini.team.joinTeam
+  );
+  router.get(
+    "/storeMsMini/getRooms",
+    middleware.jwt("mini"),
+    controller.storeMsMini.store.getRooms
+  );
+  router.get(
+    "/storeMsMini/getDms",
+    middleware.jwt("mini"),
+    controller.storeMsMini.store.getDms
+  );
+  router.get(
+    "/storeMsMini/getGoods",
+    middleware.jwt("mini"),
+    controller.storeMsMini.store.getGoods
+  );
+  router.post(
+    "/storeMsMini/placeOrder",
+    middleware.jwt("mini"),
+    controller.storeMsMini.store.placeOrder
+  );
+  router.get(
+    "/storeMsMini/getMyOrderList",
+    middleware.jwt("mini"),
+    controller.storeMsMini.store.getMyOrderList
+  );
+  router.get(
+    "/storeMsMini/getOrderDetail",
+    middleware.jwt("mini"),
+    controller.storeMsMini.store.getOrderDetail
+  );
+  router.post(
+    "/storeMsMini/updaTeOrder",
+    middleware.jwt("mini"),
+    controller.storeMsMini.store.updaTeOrder
+  );
+};

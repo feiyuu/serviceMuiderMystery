@@ -1,6 +1,5 @@
 module.exports = (app) => {
   const { router, controller } = app;
-  var adminauth = app.middleware.adminauth(); //中间件，路由守卫
 
   router.get("/storeMsAdmin/index", controller.storeMsAdmin.user.index);
   router.post(

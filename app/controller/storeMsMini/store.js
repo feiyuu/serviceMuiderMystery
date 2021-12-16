@@ -35,7 +35,7 @@ class MainController extends Controller {
     const data = this.ctx.query;
     const result = await this.app.mysql.select("orders", {
       where: {
-        userId: data.openid,
+        userId: this.ctx.openid,
       },
       orders: [["id", "DESC"]],
     });
@@ -80,7 +80,7 @@ class MainController extends Controller {
           "&content=" +
           content +
           data.room +
-          "房间的用户刚刚支付了一笔订单";
+          "房间的用户刚刚支付了一笔订单，请尽快处理！";
 
         var req = http.request(options, (res) => {
           res.setEncoding("utf8");
@@ -103,7 +103,7 @@ class MainController extends Controller {
   async placeOrder() {
     let data = this.ctx.request.body;
     console.log("placeOrder=====" + JSON.stringify(data));
-
+    data.userId = this.ctx.openid;
     const result = await this.app.mysql.insert("orders", {
       ...data,
       order_time: new Date(+new Date() + 8 * 3600 * 1000)

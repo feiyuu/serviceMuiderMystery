@@ -6,26 +6,7 @@ class MainController extends Controller {
   async index() {
     this.ctx.body = "hahahahaha mian";
   }
-  async checkControllerUserLogin() {
-    let userName = this.ctx.request.body.userName;
-    let password = this.ctx.request.body.password;
-    const sql =
-      " SELECT userName FROM users WHERE loginName = '" +
-      userName +
-      "' AND loginPsw = '" +
-      password +
-      "'";
 
-    const res = await this.app.mysql.query(sql);
-    if (res.length > 0) {
-      //登录成功,进行session缓存
-      let openId = new Date().getTime();
-      this.ctx.session.openId = { openId: openId };
-      this.ctx.body = { data: "登录成功", openId: openId };
-    } else {
-      this.ctx.body = { data: "登录失败" };
-    }
-  }
   async checkUserLogin() {
     const queryObj = this.ctx.query;
     console.log("checkLogin" + new Date().toDateString);
@@ -44,12 +25,18 @@ class MainController extends Controller {
 
       const res = await this.app.mysql.query(sql);
 
+      //wx登录成功,处理token
+      const token = this.app.jwt.sign(
+        { openid: ID },
+        this.app.config.jwt.secretMini,
+        { expiresIn: "1h" }
+      );
+    
       if (res.length > 0) {
-        //登录成功,进行session缓存
-        this.ctx.session.openId = { openId: ID };
-        this.ctx.body = { data: res[0], code: 1, openid: ID };
+        res[0].token = token;
+        this.ctx.body = { data: res[0], code: 1 };
       } else {
-        this.ctx.body = { data: "去注册", code: 2, openid: ID };
+        this.ctx.body = { data: { token: token }, code: 2 };
       }
     } else {
       this.ctx.body = { data: "登录失败", code: 0 };
@@ -60,13 +47,7 @@ class MainController extends Controller {
     let user = this.ctx.request.body;
     console.log("user=====" + JSON.stringify(user));
 
-    if (user.openid == "undefined") {
-      this.ctx.body = {
-        data: "openid不存在",
-        code: 0,
-      };
-      return;
-    }
+    user.openid = this.ctx.openid;
     const result = await this.app.mysql.insert("users", user);
     const insertSuccess = result.affectedRows === 1;
     const insertId = result.insertId;
@@ -101,7 +82,7 @@ class MainController extends Controller {
     const queryObj = this.ctx.query;
     const sql =
       " SELECT avatarUrl,gender,nickName,integral,balance FROM users WHERE users.openid = '" +
-      queryObj.openid +
+      this.ctx.openid +
       "'";
     const res = await this.app.mysql.query(sql);
     if (res.length > 0) {
@@ -111,8 +92,7 @@ class MainController extends Controller {
     }
   }
   async getBalanceUser() {
-    const queryObj = this.ctx.query;
-    const user = await this.app.mysql.get("users", { openid: queryObj.openid });
+    const user = await this.app.mysql.get("users", { openid: this.ctx.openid });
     if (user) {
       this.ctx.body = { data: user.balance, code: 1 };
     } else {
@@ -123,20 +103,9 @@ class MainController extends Controller {
     let data = this.ctx.request.body;
     console.log("datapay=====" + JSON.stringify(data));
 
-    if (
-      data.recordUserId == "undefined" ||
-      data.recordUserId == "" ||
-      data.recordUserId == null
-    ) {
-      this.ctx.body = {
-        data: "请登录后再试",
-        code: 0,
-      };
-      return;
-    }
     console.log("data.isBlance" + data.isBlance);
     let success = false;
-
+    data.recordUserId = this.ctx.openid;
     if (data.isBlance == "true") {
       const conn = await this.app.mysql.beginTransaction();
       try {
@@ -145,7 +114,7 @@ class MainController extends Controller {
           "UPDATE users SET balance = balance - " +
           data.charge +
           " WHERE openid = '" +
-          data.recordUserId +
+          this.ctx.openid +
           "'";
         await conn.query(sqlUpdata);
         //插入资金明细记录
@@ -169,7 +138,7 @@ class MainController extends Controller {
         "UPDATE users SET integral = integral + " +
         data.charge +
         " WHERE openid = '" +
-        data.recordUserId +
+        this.ctx.openid +
         "'";
       await this.app.mysql.query(sqlUpdata);
       //插入资金明细记录
@@ -198,18 +167,7 @@ class MainController extends Controller {
   async reCharge() {
     let data = this.ctx.request.body;
     console.log("reCharge=====" + JSON.stringify(data));
-
-    if (
-      data.recordUserId == "undefined" ||
-      data.recordUserId == "" ||
-      data.recordUserId == null
-    ) {
-      this.ctx.body = {
-        data: "请登录后再试",
-        code: 0,
-      };
-      return;
-    }
+    data.recordUserId = this.ctx.openid;
     let success = false;
     const conn = await this.app.mysql.beginTransaction();
     try {
@@ -220,7 +178,7 @@ class MainController extends Controller {
         ",integral = integral + " +
         data.charge +
         " WHERE openid = '" +
-        data.recordUserId +
+        this.ctx.openid +
         "'";
       await conn.query(sqlUpdata);
       //插入充值资金明细记录
@@ -252,9 +210,8 @@ class MainController extends Controller {
     }
   }
   async getMyPurchaseRecordList() {
-    const queryObj = this.ctx.query;
     const result = await this.app.mysql.select("purchase_record", {
-      where: { recordUserId: queryObj.openid },
+      where: { recordUserId: this.ctx.openid },
       orders: [["id", "desc"]],
     });
     if (result) {

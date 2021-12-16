@@ -8,7 +8,7 @@ class MainController extends Controller {
   }
 
   async getTeamList() {
-    const openid = this.ctx.query.openid;
+    const openid = this.ctx.openid;
     let sql =
       "SELECT *,organize_team.Id as Id,(SELECT COUNT(*) FROM teamusers WHERE teamusers.organizeTeamId = organize_team.Id)joinedCount,(SELECT COUNT(*) FROM teamusers WHERE teamusers.organizeTeamId = organize_team.Id AND teamusers.teamUserId = '" +
       openid +
@@ -38,7 +38,7 @@ class MainController extends Controller {
     }
   }
   async getMyTeamList() {
-    const openid = this.ctx.query.openid;
+    const openid = this.ctx.openid;
     let sql =
       "SELECT *,organize_team.Id as Id,(SELECT COUNT(*) FROM teamusers WHERE teamusers.organizeTeamId = organize_team.Id )joinedCount FROM organize_team LEFT JOIN dramas ON organize_team.teamDramaId = dramas.Id " +
       "WHERE organize_team.Id IN (SELECT organizeTeamId FROM teamusers WHERE teamusers.teamUserId = '" +
@@ -90,6 +90,15 @@ class MainController extends Controller {
         Id;
       let users = await this.app.mysql.query(sqlusers);
       result[0].teamUsers = users;
+      if (users && users.length > 0) {
+        result[0].joined = false;
+        for (var i = 0; i < users.length; i++) {
+          if (this.ctx.openid == users[i].openid) {
+            result[0].joined = true;
+          }
+        }
+      }
+
       //超过七天非新上架
       for (let i = 0; i < result.length; i++) {
         if (result[i].addTime) {
@@ -116,17 +125,7 @@ class MainController extends Controller {
     let data = this.ctx.request.body;
     console.log("datapay=====" + JSON.stringify(data));
 
-    if (
-      data.teamUserId == "undefined" ||
-      data.teamUserId == "" ||
-      data.teamUserId == null
-    ) {
-      this.ctx.body = {
-        data: "请登录后再试",
-        code: 0,
-      };
-      return;
-    }
+    data.teamUserId = this.ctx.openid;
     const result = await this.app.mysql.insert("teamusers", {
       ...data,
       teamUserJoinTime: new Date(+new Date() + 8 * 3600 * 1000)
