@@ -28,7 +28,21 @@ module.exports = (options) => {
           token,
           options == "mini"
             ? ctx.app.config.jwt.secretMini
-            : ctx.app.config.jwt.secretAdmin
+            : ctx.app.config.jwt.secretAdmin,
+          (err, decoded) => {
+            if (err) {
+              switch (err.name) {
+                case "JsonWebTokenError":
+                  return { message: "无效'token" };
+                case "TokenExpiredError":
+                  return { message: "'token过期'" };
+              }
+            } else if (decoded) {
+              return decoded;
+            }else{
+              return { message: "'token解析出错'" };
+            }
+          }
         ); //解密token
         console.log("decoded============" + JSON.stringify(decoded));
         if (decoded && decoded.message) {
@@ -43,7 +57,7 @@ module.exports = (options) => {
       } else {
         ctx.body = {
           code: 101,
-          msg: "没有token",
+          msg: "缺少token",
         };
       }
     } else {

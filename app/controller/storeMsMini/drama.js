@@ -27,7 +27,6 @@ class MainController extends Controller {
           );
           var day =
             (new Date().getTime() - dateAdd.getTime()) / (1000 * 60 * 60 * 24);
-          console.log("day============" + day + results[i].dramaName);
           if (day > 7) {
             results[i].isNew = 0;
           } else {
@@ -66,7 +65,6 @@ class MainController extends Controller {
           let dateAdd = new Date(Date.parse(drama.addTime.replace(/-/g, "/")));
           var day =
             (new Date().getTime() - dateAdd.getTime()) / (1000 * 60 * 60 * 24);
-          console.log("day============" + day + drama.dramaName);
           if (day > 7) {
             drama.isNew = 0;
           } else {
@@ -228,7 +226,6 @@ class MainController extends Controller {
           );
           var day =
             (new Date().getTime() - dateAdd.getTime()) / (1000 * 60 * 60 * 24);
-          console.log("day============" + day + results[i].dramaName);
           if (day > 7) {
             results[i].isNew = 0;
           } else {
