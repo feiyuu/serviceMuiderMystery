@@ -1,66 +1,149 @@
 module.exports = (app) => {
-  const { router, controller } = app;
+  const { router, controller, middleware } = app;
 
-  router.get("/storeMsAdmin/index", controller.storeMsAdmin.user.index);
+  router.get(
+    "/storeMsAdmin/index",
+    middleware.jwt("admin"),
+    controller.storeMsAdmin.user.index
+  );
   router.post(
     "/storeMsAdmin/checkControllerUserLogin",
+    middleware.jwt("admin"),
     controller.storeMsAdmin.user.checkControllerUserLogin
   );
-  router.post("/storeMsAdmin/checkUserPsw", controller.storeMsAdmin.user.checkUserPsw);
-  router.get("/storeMsAdmin/getDMUsers", controller.storeMsAdmin.user.getDMUsers);
-  router.get("/storeMsAdmin/getUser", controller.storeMsAdmin.user.getUser);
-  router.post("/storeMsAdmin/updateUser", controller.storeMsAdmin.user.updateUser);
-  router.post("/storeMsAdmin/inertUser", controller.storeMsAdmin.user.inertUser);
-  router.get("/storeMsAdmin/autoId", controller.storeMsAdmin.user.autoId);
+  router.post(
+    "/storeMsAdmin/checkUserPsw",
+    middleware.jwt("admin"),
+    controller.storeMsAdmin.user.checkUserPsw
+  );
+  router.get(
+    "/storeMsAdmin/getDMUsers",
+    middleware.jwt("admin"),
+    controller.storeMsAdmin.user.getDMUsers
+  );
+  router.get(
+    "/storeMsAdmin/getUser",
+    middleware.jwt("admin"),
+    controller.storeMsAdmin.user.getUser
+  );
+  router.post(
+    "/storeMsAdmin/updateUser",
+    middleware.jwt("admin"),
+    controller.storeMsAdmin.user.updateUser
+  );
+  router.post(
+    "/storeMsAdmin/inertUser",
+    middleware.jwt("admin"),
+    controller.storeMsAdmin.user.inertUser
+  );
+  router.get(
+    "/storeMsAdmin/autoId",
+    middleware.jwt("admin"),
+    controller.storeMsAdmin.user.autoId
+  );
   router.get(
     "/storeMsAdmin/getFilterDramaList",
+    middleware.jwt("admin"),
     controller.storeMsAdmin.drama.getFilterDramaList
   );
   router.get(
     "/storeMsAdmin/getDramaDetail",
+    middleware.jwt("admin"),
     controller.storeMsAdmin.drama.getDramaDetail
   );
   router.get(
     "/storeMsAdmin/getLikeDramaDetail",
+    middleware.jwt("admin"),
     controller.storeMsAdmin.drama.getLikeDramaDetail
   );
   router.post(
     "/storeMsAdmin/updateDrama",
+    middleware.jwt("admin"),
     controller.storeMsAdmin.drama.updateDrama
   );
   router.post(
     "/storeMsAdmin/inertDrama",
+    middleware.jwt("admin"),
     controller.storeMsAdmin.drama.inertDrama
   );
   router.post(
     "/storeMsAdmin/deleteDrama",
+    middleware.jwt("admin"),
     controller.storeMsAdmin.drama.deleteDrama
   );
   router.get(
     "/storeMsAdmin/getTeamList",
+    middleware.jwt("admin"),
     controller.storeMsAdmin.team.getTeamList
   );
   router.get(
     "/storeMsAdmin/getTeamDetail",
+    middleware.jwt("admin"),
     controller.storeMsAdmin.team.getTeamDetail
   );
-  router.post("/storeMsAdmin/updateTeamState", controller.storeMsAdmin.team.updateTeamState);
-  router.post("/storeMsAdmin/insertTeam", controller.storeMsAdmin.team.insertTeam);
-  router.post("/storeMsAdmin/updateTeam", controller.storeMsAdmin.team.updateTeam);
-  router.get("/storeMsAdmin/getRooms", controller.storeMsAdmin.store.getRooms);
-  router.get("/storeMsAdmin/getRoomDetail", controller.storeMsAdmin.store.getRoomDetail);
-  router.post("/storeMsAdmin/deleteRoom", controller.storeMsAdmin.store.deleteRoom);
-  router.post("/storeMsAdmin/updaTeRoom", controller.storeMsAdmin.store.updaTeRoom);
-  router.get("/storeMsAdmin/getGoods", controller.storeMsAdmin.store.getGoods);
-  router.post("/storeMsAdmin/deleteGoods", controller.storeMsAdmin.store.deleteGoods);
-  router.post("/storeMsAdmin/updaTeGoods", controller.storeMsAdmin.store.updaTeGoods);
-  router.post("/storeMsAdmin/updaTeGoodsState", controller.storeMsAdmin.store.updaTeGoodsState);
+  router.post(
+    "/storeMsAdmin/updateTeamState",
+    middleware.jwt("admin"),
+    controller.storeMsAdmin.team.updateTeamState
+  );
+  router.post(
+    "/storeMsAdmin/insertTeam",
+    middleware.jwt("admin"),
+    controller.storeMsAdmin.team.insertTeam
+  );
+  router.post(
+    "/storeMsAdmin/updateTeam",
+    middleware.jwt("admin"),
+    controller.storeMsAdmin.team.updateTeam
+  );
+  router.get(
+    "/storeMsAdmin/getRooms",
+    middleware.jwt("admin"),
+    controller.storeMsAdmin.store.getRooms
+  );
+  router.get(
+    "/storeMsAdmin/getRoomDetail",
+    middleware.jwt("admin"),
+    controller.storeMsAdmin.store.getRoomDetail
+  );
+  router.post(
+    "/storeMsAdmin/deleteRoom",
+    middleware.jwt("admin"),
+    controller.storeMsAdmin.store.deleteRoom
+  );
+  router.post(
+    "/storeMsAdmin/updaTeRoom",
+    middleware.jwt("admin"),
+    controller.storeMsAdmin.store.updaTeRoom
+  );
+  router.get(
+    "/storeMsAdmin/getGoods",
+    middleware.jwt("admin"),
+    controller.storeMsAdmin.store.getGoods
+  );
+  router.post(
+    "/storeMsAdmin/deleteGoods",
+    middleware.jwt("admin"),
+    controller.storeMsAdmin.store.deleteGoods
+  );
+  router.post(
+    "/storeMsAdmin/updaTeGoods",
+    middleware.jwt("admin"),
+    controller.storeMsAdmin.store.updaTeGoods
+  );
+  router.post(
+    "/storeMsAdmin/updaTeGoodsState",
+    middleware.jwt("admin"),
+    controller.storeMsAdmin.store.updaTeGoodsState
+  );
   router.get(
     "/storeMsAdmin/getOrderList",
+    middleware.jwt("admin"),
     controller.storeMsAdmin.store.getOrderList
   );
   router.post(
     "/storeMsAdmin/updaTeOrder",
+    middleware.jwt("admin"),
     controller.storeMsAdmin.store.updaTeOrder
   );
 };

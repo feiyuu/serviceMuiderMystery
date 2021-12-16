@@ -18,14 +18,19 @@ class MainController extends Controller {
 
     const res = await this.app.mysql.query(sql);
     if (res.length > 0) {
-      //登录成功,进行session缓存
-      let openId = new Date().getTime();
-      this.ctx.session.openId = { openId: openId };
-      this.ctx.body = { data: res[0], openId: openId, code: 1 };
+      //wx登录成功,处理token
+      const token = this.app.jwt.sign(
+        { loginName: userName },
+        this.app.config.jwt.secretAdmin,
+        { expiresIn: "1h" }
+      );
+      res[0].token = token;
+      this.ctx.body = { data: res[0],  code: 1 };
     } else {
       this.ctx.body = { data: "登录失败", code: 2 };
     }
   }
+  //校验非当前登录账号密码
   async checkUserPsw() {
     let Id = this.ctx.request.body.Id;
     let password = this.ctx.request.body.password;
