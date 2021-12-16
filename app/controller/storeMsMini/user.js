@@ -29,7 +29,7 @@ class MainController extends Controller {
       const token = this.app.jwt.sign(
         { openid: ID },
         this.app.config.jwt.secretMini,
-        { expiresIn: "1h" }
+        { expiresIn: "240h" }
       );
     
       if (res.length > 0) {

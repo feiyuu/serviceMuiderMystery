@@ -22,7 +22,7 @@ class MainController extends Controller {
       const token = this.app.jwt.sign(
         { loginName: userName },
         this.app.config.jwt.secretAdmin,
-        { expiresIn: "1h" }
+        { expiresIn: "240h" }
       );
       res[0].token = token;
       this.ctx.body = { data: res[0],  code: 1 };

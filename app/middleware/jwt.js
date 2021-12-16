@@ -20,9 +20,7 @@ module.exports = (options) => {
     if (!whiteList.some((item) => ctx.request.url.indexOf(item) != -1)) {
       //判断接口路径是否在白名单
       let token = ctx.request.header.authorization; //拿到token
-      console.log("token============" + token);
       if (token && token != "null") {
-        console.log("if (token) {============" + token);
         //如果token存在
         let decoded = ctx.app.jwt.verify(
           token,
@@ -44,7 +42,6 @@ module.exports = (options) => {
             }
           }
         ); //解密token
-        console.log("decoded============" + JSON.stringify(decoded));
         if (decoded && decoded.message) {
           ctx.body = {
             code: 101,
