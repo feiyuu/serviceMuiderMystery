@@ -95,6 +95,11 @@ module.exports = (app) => {
     middleware.jwt("mini"),
     controller.storeMsMini.team.joinTeam
   );
+  router.post(
+    "/storeMsMini/quitTeam",
+    middleware.jwt("mini"),
+    controller.storeMsMini.team.quitTeam
+  );
   router.get(
     "/storeMsMini/getRooms",
     middleware.jwt("mini"),

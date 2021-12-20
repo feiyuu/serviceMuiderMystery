@@ -102,7 +102,42 @@ class MainController extends Controller {
       }
     );
     console.log("updaTeOrder  result ==  " + JSON.stringify(result));
-    if (result.affectedRows === 1) {
+
+    let success = result.affectedRows === 1;
+    
+    if (data.state == 60) {
+      const conn = await this.app.mysql.beginTransaction();
+      try {
+        //退款，扣积分
+        let sqlUpdata =
+          "UPDATE users SET balance = balance + " +
+          data.charge +
+          ",integral = integral - " +
+          data.charge +
+          " WHERE openid = '" +
+          data.userId +
+          "'";
+        await conn.query(sqlUpdata);
+        //插入资金明细记录
+        await conn.insert("purchase_record", {
+          recordUserId: data.userId,
+          charge: data.charge,
+          recordName: "退还小卖铺消费：+" + data.charge,
+          recordTime: new Date(+new Date() + 8 * 3600 * 1000)
+            .toJSON()
+            .substr(0, 19)
+            .replace("T", " "),
+        });
+        await conn.commit(); //提交事务
+        success = true;
+      } catch (err) {
+        success = false;
+        await conn.rollback(); //回滚事务
+        throw err;
+      }
+    }
+
+    if (success) {
       this.ctx.body = { data: "操作成功", code: 1 };
     } else {
       this.ctx.body = { data: "", code: 2 };

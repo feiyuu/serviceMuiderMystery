@@ -143,5 +143,58 @@ class MainController extends Controller {
       };
     }
   }
+  async quitTeam() {
+    let data = this.ctx.request.body;
+    console.log("quitTeam=====" + JSON.stringify(data));
+
+    const result = await this.app.mysql.delete("teamusers", {
+      teamUserId: this.ctx.openid,
+      organizeTeamId: data.organizeTeamId,
+    });
+
+    let success = result.affectedRows === 1;
+
+    const conn = await this.app.mysql.beginTransaction();
+    try {
+      //退款，扣积分
+      let sqlUpdata =
+        "UPDATE users SET balance = balance + " +
+        data.charge +
+        ",integral = integral - " +
+        data.charge +
+        " WHERE openid = '" +
+        this.ctx.openid +
+        "'";
+      await conn.query(sqlUpdata);
+      //插入资金明细记录
+      await conn.insert("purchase_record", {
+        recordUserId:this.ctx.openid,
+        charge:data.charge,
+        recordName:data.recordName,
+        recordTime: new Date(+new Date() + 8 * 3600 * 1000)
+          .toJSON()
+          .substr(0, 19)
+          .replace("T", " "),
+      });
+      await conn.commit(); //提交事务
+      success = true;
+    } catch (err) {
+      success = false;
+      await conn.rollback(); //回滚事务
+      throw err;
+    }
+
+    if (success) {
+      this.ctx.body = {
+        data: "",
+        code: 1,
+      };
+    } else {
+      this.ctx.body = {
+        data: "异常",
+        code: 0,
+      };
+    }
+  }
 }
 module.exports = MainController;

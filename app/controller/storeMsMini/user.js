@@ -9,7 +9,6 @@ class MainController extends Controller {
 
   async checkUserLogin() {
     const queryObj = this.ctx.query;
-    console.log("checkLogin" + new Date().toDateString);
     var data = await this.ctx.curl(
       "https://api.weixin.qq.com/sns/jscode2session?appid=wx998d4224c089a57d&secret=21e87ded5a27ac74150ae048b63aa54b&js_code=" +
         queryObj.wxCode +

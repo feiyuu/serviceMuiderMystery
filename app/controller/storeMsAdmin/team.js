@@ -128,14 +128,6 @@ class MainController extends Controller {
   async updateTeamState() {
     const data = this.ctx.request.body;
 
-    if(data.state == 30){
-      let sqlUpdata =
-        "UPDATE controller_users SET dmHot = dmHot + 1 WHERE Id = '" +
-        data.dmId +
-        "'";
-      await this.app.mysql.query(sqlUpdata);
-    }
-
     const result = await this.app.mysql.update(
       "organize_team",
       {
@@ -148,7 +140,70 @@ class MainController extends Controller {
       }
     );
     console.log("updateTeamState  result ==  " + JSON.stringify(result));
-    if (result.affectedRows === 1) {
+
+    let success = result.affectedRows === 1;
+    if (data.state == 30) {
+      let sqlUpdata =
+        "UPDATE controller_users SET dmHot = dmHot + 1 WHERE Id = '" +
+        data.dmId +
+        "'";
+      await this.app.mysql.query(sqlUpdata);
+    } else if (data.state == 50) {
+      try {
+        let sqlTeamUserIds =
+          "SELECT teamUserId FROM teamusers WHERE organizeTeamId = '" +
+          data.organizeTeamId +
+          "'";
+        let resultTeamUserIds = await this.app.mysql.query(sqlTeamUserIds);
+        console.log(
+          "updateTeamState  resultTeamUserIds ==  " +
+            JSON.stringify(resultTeamUserIds)
+        );
+
+        if (resultTeamUserIds.length > 0) {
+          let sqlPrice =
+            "SELECT price FROM dramas WHERE Id = '" + data.teamDramaId + "'";
+          let resultPrice = await this.app.mysql.query(sqlPrice);
+          let charge = resultPrice[0].price;
+          console.log(
+            "updateTeamState  resultPrice ==  " + JSON.stringify(resultPrice)
+          );
+
+          for (let i = 0; i < resultTeamUserIds.length; i++) {
+            let userId = resultTeamUserIds[i].teamUserId;
+            //退款，扣积分
+            let sqlUpdata =
+              "UPDATE users SET balance = balance + " +
+              charge +
+              ",integral = integral - " +
+              charge +
+              " WHERE openid = '" +
+              userId +
+              "'";
+            this.app.mysql.query(sqlUpdata);
+            //插入资金明细记录
+            this.app.mysql.insert("purchase_record", {
+              recordUserId: userId,
+              charge: charge,
+              recordName:
+                "解散《" + data.teamDramaName + "》组局费用：+" + +charge,
+              recordTime: new Date(+new Date() + 8 * 3600 * 1000)
+                .toJSON()
+                .substr(0, 19)
+                .replace("T", " "),
+            });
+            success = true;
+          }
+        } else {
+       
+        }
+      } catch (err) {
+        success = false;
+        throw err;
+      }
+    }
+
+    if (success) {
       this.ctx.body = { data: "操作成功", code: 1 };
     } else {
       this.ctx.body = { data: "", code: 2 };
