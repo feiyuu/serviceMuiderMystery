@@ -83,8 +83,8 @@ class MainController extends Controller {
       result[0].roles = JSON.parse(result[0].roles) || [];
       //从uer表中查询参与组局的用户信息
       let sqlusers =
-        "SELECT * FROM teamUsers LEFT JOIN users ON teamUsers.teamUserId = users.openid " +
-        "WHERE teamUsers.organizeTeamId= " +
+        "SELECT * FROM teamusers LEFT JOIN users ON teamusers.teamUserId = users.openid " +
+        "WHERE teamusers.organizeTeamId= " +
         Id;
       let users = await this.app.mysql.query(sqlusers);
       result[0].teamUsers = users;

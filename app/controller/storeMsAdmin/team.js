@@ -19,7 +19,7 @@ class MainController extends Controller {
     if (result.length > 0) {
       for (var i = 0; i < result.length; i++) {
         let teamUsersCountSql =
-          "SELECT COUNT(*) AS count FROM teamUsers WHERE teamUsers.organizeTeamId= " +
+          "SELECT COUNT(*) AS count FROM teamusers WHERE teamusers.organizeTeamId= " +
           result[i].Id;
         let teamUsersCount = await this.app.mysql.query(teamUsersCountSql);
         result[i].joinedCount = teamUsersCount[0].count;
