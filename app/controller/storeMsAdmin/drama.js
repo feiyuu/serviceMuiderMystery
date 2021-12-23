@@ -58,8 +58,8 @@ class MainController extends Controller {
 
     let result = await this.app.mysql.query(sql);
 
-    if (result.length > 0) {
-      this.ctx.body = { code: 1, data: result[0] };
+    if (result) {
+      this.ctx.body = { code: 1, data: result[0] || {}};
     } else {
       this.ctx.body = { code: 2, data: "查询失败" };
     }

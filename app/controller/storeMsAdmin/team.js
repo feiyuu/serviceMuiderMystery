@@ -16,7 +16,7 @@ class MainController extends Controller {
       orders: [["id", "DESC"]],
     });
 
-    if (result.length > 0) {
+    if (result) {
       for (var i = 0; i < result.length; i++) {
         let teamUsersCountSql =
           "SELECT COUNT(*) AS count FROM teamusers WHERE teamusers.organizeTeamId= " +
