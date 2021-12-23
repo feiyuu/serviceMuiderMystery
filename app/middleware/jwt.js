@@ -4,6 +4,7 @@ const whiteListMini = [
   "getDms",
   "getHomeDramas",
   "getGoods",
+  "getFilterDramaList",
   "checkControllerUserLogin",
 ]; //白名单（一般登录注册这两个接口不需要校验token）此处也可配置在全局
 const whiteListAdmin = ["checkControllerUserLogin"]; //白名单（一般登录注册这两个接口不需要校验token）此处也可配置在全局
