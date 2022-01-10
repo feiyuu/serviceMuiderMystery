@@ -14,7 +14,7 @@ class MainController extends Controller {
       orders: [["id", "DESC"]],
     });
 
-    if (result.length > 0) {
+    if (result) {
       this.ctx.body = { data: result, code: 1 };
     } else {
       this.ctx.body = { data: "", code: 2 };
@@ -81,7 +81,7 @@ class MainController extends Controller {
       where: data,
       orders: [["id", "DESC"]],
     });
-    if (result.length > 0) {
+    if (result) {
       this.ctx.body = { data: result, code: 1 };
     } else {
       this.ctx.body = { data: "", code: 2 };
